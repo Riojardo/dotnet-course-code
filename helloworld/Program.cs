@@ -60,8 +60,9 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-      DataContextDapper dapper = new DataContextDapper();
-        
+        DataContextDapper dapper = new DataContextDapper();
+        DataContextEF entityFramework = new DataContextEF();
+
         string sqlCommand = "SELECT GETDATE()";
 
         DateTime rigtNow = dapper.LoadDataSingle<DateTime>(sqlCommand);
@@ -77,6 +78,9 @@ internal class Program
             Price = 2346.43m,
             VideoCard = "RTX 32323"
         };
+
+        entityFramework.Add(myComputer);
+        entityFramework.SaveChanges();
 
         string formattedReleaseDate = myComputer.ReleaseDate.ToString("yyyy-MM-dd HH:mm:ss");
         string formattedPrice = myComputer.Price.ToString("0.00", CultureInfo.InvariantCulture);
@@ -112,17 +116,41 @@ internal class Program
 
         IEnumerable<Computer> Computers = dapper.LoadData<Computer>(sqlSelect);
 
+
         foreach (Computer OneComputer in Computers)
         {
             Console.WriteLine
-            ("'"+ myComputer.Motherboard
-        + "','" + myComputer.HasWifi
-        + "','" + myComputer.HasLTE
+            ("'" + OneComputer.ComputerId
+        + "','" + OneComputer.Motherboard  
+        + "','" + OneComputer.HasWifi
+        + "','" + OneComputer.HasLTE
         + "','" + formattedReleaseDate
         + "','" + formattedPrice
-        + "','" + myComputer.VideoCard
+        + "','" + OneComputer.VideoCard
         + "'");
         }
+
+        IEnumerable<Computer>? ComputersEf = entityFramework.Computer?.ToList<Computer>();
+
+        if (ComputersEf != null) {
+        foreach (Computer OneComputer in ComputersEf)
+        {
+            Console.WriteLine
+               ("'" + OneComputer.ComputerId
+        + "','" + OneComputer.Motherboard 
+        + "','" + OneComputer.HasWifi
+        + "','" + OneComputer.HasLTE
+        + "','" + formattedReleaseDate
+        + "','" + formattedPrice
+        + "','" + OneComputer.VideoCard
+        + "'");
+        }
+        }
+
+
+
+
+
         // myComputer.HasWifi =false;
         // Console.WriteLine(myComputer.CPUCores);
         // Console.WriteLine(myComputer.Motherboard);
